@@ -18,11 +18,7 @@
  */
 
 package com.fr3ts0n.ecu.gui.androbd;
-
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 
 import com.fr3ts0n.ecu.prot.obd.ElmProt;
 
@@ -63,7 +59,7 @@ public abstract class CommService
 	public static final ElmProt elm = new ElmProt();
 
 	Context mContext;
-	private Handler mHandler = null;
+	private CommServiceCallback callback = null;
 	STATE mState;
 
 	/**
@@ -79,23 +75,23 @@ public abstract class CommService
 	/**
 	 * Constructor. Prepares a new Communication session.
 	 *
-	 * @param handler A Handler to send messages back to the UI Activity
+	 * @param callback A CommServiceCallback to send messages back to the UI Activity
 	 */
-	private CommService(Handler handler)
+	private CommService(CommServiceCallback callback)
 	{
 		this();
-		mHandler = handler;
+		this.callback = callback;
 	}
 
 	/**
 	 * Constructor. Prepares a new Bluetooth Communication session.
 	 *
 	 * @param context The UI Activity Context
-	 * @param handler A Handler to send messages back to the UI Activity
+	 * @param callback A CommServiceCallback to send messages back to the UI Activity
 	 */
-	CommService(Context context, Handler handler)
+	CommService(Context context, CommServiceCallback callback)
 	{
-		this(handler);
+		this(callback);
 		mContext = context;
 	}
 
@@ -109,8 +105,8 @@ public abstract class CommService
 		log.log(Level.FINE, "setState() " + mState + " -> " + state);
 		mState = state;
 
-		// Give the new state to the Handler so the UI Activity can update
-		mHandler.obtainMessage(MainActivity.MESSAGE_STATE_CHANGE, state).sendToTarget();
+		// Give the new state to the CommServiceCallback so the UI Activity can update
+		callback.onStateChange(state);
 	}
 	
 	/**
@@ -148,11 +144,7 @@ public abstract class CommService
 		// set new state offline
 		setState(STATE.OFFLINE);
 		// Send a failure message back to the Activity
-		Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(MainActivity.TOAST, mContext.getString(R.string.unabletoconnect));
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		callback.onFail(mContext.getString(R.string.unabletoconnect));
 	}
 
 	/**
@@ -164,11 +156,7 @@ public abstract class CommService
 		// set new state offline
 		setState(STATE.OFFLINE);
 		// Send a failure message back to the Activity
-		Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(MainActivity.TOAST, mContext.getString(R.string.connectionlost));
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		callback.onFail(mContext.getString(R.string.connectionlost));
 	}
 
 	/**
@@ -177,11 +165,7 @@ public abstract class CommService
 	void connectionEstablished(String deviceName)
 	{
 		// Send the name of the connectionEstablished device back to the UI Activity
-		Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_DEVICE_NAME);
-		Bundle bundle = new Bundle();
-		bundle.putString(MainActivity.DEVICE_NAME, deviceName);
-		msg.setData(bundle);
-		mHandler.sendMessage(msg);
+		callback.onFetchedDeviceName(deviceName);
 
 		// set state to connected
 		setState(STATE.CONNECTED);

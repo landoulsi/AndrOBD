@@ -89,9 +89,9 @@ public class UsbCommService extends CommService
 			}
 		};
 
-	public UsbCommService(Context context, Handler handler)
+	public UsbCommService(Context context, CommServiceCallback callback)
 	{
-		super(context, handler);
+		super(context, callback);
 		elm.addTelegramWriter(this);
 	}
 

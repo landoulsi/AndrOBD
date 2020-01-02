@@ -50,11 +50,11 @@ public class NetworkCommService
 	 * Constructor. Prepares a new Network Communication session.
 	 *
 	 * @param context The UI Activity Context
-	 * @param handler A Handler to send messages back to the UI Activity
+	 * @param callback A Handler to send messages back to the UI Activity
 	 */
-	public NetworkCommService(Context context, Handler handler)
+	public NetworkCommService(Context context, CommServiceCallback callback)
 	{
-		super(context, handler);
+		super(context, callback);
 		ser.setMessageHandler(elm);
 	}
 

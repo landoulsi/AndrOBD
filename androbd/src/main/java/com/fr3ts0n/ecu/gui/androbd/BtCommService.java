@@ -55,11 +55,11 @@ public class BtCommService extends CommService
 	 * Constructor. Prepares a new Bluetooth Communication session.
 	 *
 	 * @param context The UI Activity Context
-	 * @param handler A Handler to send messages back to the UI Activity
+	 * @param callback A Handler to send messages back to the UI Activity
 	 */
-	BtCommService(Context context, Handler handler)
+	BtCommService(Context context, CommServiceCallback callback)
 	{
-		super(context, handler);
+		super(context, callback);
 
 		// Always cancel discovery because it will slow down a connection
 		// Member fields
